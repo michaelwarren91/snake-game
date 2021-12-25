@@ -10,7 +10,7 @@ Dependencies
 
 How To Build
 ---
-You need to download the SDL2 libraries and headers for whatever platform and configuration you want and set up the linking and includes yourself. You may have to change the SDL2 include paths in the source files as well.
+You need to download the SDL2 libraries and headers for whichever platform you want and set up the linking and includes yourself. You may have to change the SDL2 include paths in the source files as well.
 
 
 
