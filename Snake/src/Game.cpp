@@ -20,7 +20,7 @@ void Game::onInit(const Window& window) {
 	int startX = m_numCells / 2;
 	int startY = m_numCells / 2;
 
-	m_player = new Player(startX, startY, cellWidth, cellHeight);
+	m_player = new Player(startX, startY, cellWidth, cellHeight, m_numCells);
 	grid = new bool[m_numCells * m_numCells];
 
 	// initialize this grid (might not even need this block of code)

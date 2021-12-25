@@ -1,10 +1,10 @@
 #include "Player.h"
 
-Player::Player(char x, char y, double cellWidth, double cellHeight) : 
+Player::Player(char x, char y, double cellWidth, double cellHeight, int numCells) : 
 	m_cellWidth(cellWidth), m_cellHeight(cellHeight)
 {
-	// we really allocating 400 right here? alright
-	m_snakeBodyParts = new SnakeBodyPart[20 * 20];
+	// we really allocating num_cells * num_cells right here? alright
+	m_snakeBodyParts = new SnakeBodyPart[numCells * numCells];
 	m_snakeBodyParts[0] = SnakeBodyPart{ x, y, Direction::RIGHT };
 
 	m_head = &m_snakeBodyParts[0];

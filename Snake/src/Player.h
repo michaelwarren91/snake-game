@@ -27,7 +27,7 @@ private:
 	Direction m_prevTailDirection;
 
 public:
-	Player(char x, char y, double cellWidth, double cellHeight);
+	Player(char x, char y, double cellWidth, double cellHeight, int numCells);
 	~Player();
 
 	void setDirection(Direction direction);
