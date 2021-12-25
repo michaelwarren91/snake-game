@@ -19,7 +19,7 @@ int main(int ArgCount, char **Args)
 		return 1;
 	}
 
-	Scene* scene = new Game();
+	Scene* scene = new Game(16);
 	w->setScene(scene);
 	w->run();
 

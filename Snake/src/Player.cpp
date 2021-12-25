@@ -59,6 +59,8 @@ void Player::moveForward() {
 
 		prevDirection = direction;
 	}
+
+	m_prevTailDirection = prevDirection;
 }
 
 void Player::render(SDL_Renderer& renderer) const {
@@ -66,10 +68,19 @@ void Player::render(SDL_Renderer& renderer) const {
 	Uint8 r, g, b, a;
 	SDL_GetRenderDrawColor(&renderer, &r, &g, &b, &a);
 
-	SDL_Rect rect;
-	SDL_SetRenderDrawColor(&renderer, 0x00, 0xCD, 0x00, 0xFF);
+	// draw the head a different color
+	SDL_Rect rect = {
+		(int) (m_head->m_x * m_cellWidth),
+		(int) (m_head->m_y * m_cellHeight),
+		(int) m_cellWidth,
+		(int) m_cellHeight
+	};
+	SDL_SetRenderDrawColor(&renderer, 0x00, 0x88, 0x00, 0xFF);
+	SDL_RenderFillRect(&renderer, &rect);
 
-	for (unsigned int i = 0; i < m_length; i++) {
+	// draw the rest of the body
+	SDL_SetRenderDrawColor(&renderer, 0x00, 0xCD, 0x00, 0xFF);
+	for (unsigned int i = 1; i < m_length; i++) {
 		const SnakeBodyPart& part = m_snakeBodyParts[i];
 
 		rect.x = (int) (part.m_x * m_cellWidth);
@@ -119,7 +130,7 @@ unsigned int Player::getLength() const {
 void Player::grow() {
 	unsigned char m_x = m_tail->m_x;
 	unsigned char m_y = m_tail->m_y;
-	Direction direction = m_tail->direction;
+	Direction direction = m_prevTailDirection;
 
 	char dx = 0, dy = 0;
 	switch (direction) {

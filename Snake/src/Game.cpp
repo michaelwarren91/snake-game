@@ -7,23 +7,25 @@
 #include "core/Window.h"
 
 
+Game::Game(int numCells) : m_numCells(numCells) {}
 Game::~Game() {}
 
 void Game::onInit(const Window& window) {
 	m_windowWidth = window.getWidth();
 	m_windowHeight = window.getHeight();
 
-	double cellWidth = m_windowWidth / 20.0;
-	double cellHeight = m_windowHeight / 20.0;
+	double cellWidth = m_windowWidth / (double) m_numCells;
+	double cellHeight = m_windowHeight / (double) m_numCells;
 	
-	m_player = new Player(9, 9, cellWidth, cellHeight);
-	
-	// initialize this grid (might not even need this block of code)
-	for (int row = 0; row < 20; row++)
-		for (int column = 0; column < 20; column++)
-			grid[row][column] = false;
+	m_player = new Player(0, 0, cellWidth, cellHeight);
+	grid = new bool[m_numCells * m_numCells];
 
-	grid[9][9] = true;
+	// initialize this grid (might not even need this block of code)
+	for (int row = 0; row < m_numCells; row++)
+		for (int column = 0; column < m_numCells; column++)
+			grid[row * m_numCells + column] = false;
+
+	grid[0] = true;
 	
 	//m_lastUpdateTime = 0;
 	m_accumulatedTime = 0;
@@ -88,7 +90,7 @@ void Game::onUpdate(double dt) {
 	m_accumulatedTime += (Uint64) (dt * 1000);
 	// I want to simulate a "step by step" feeling here
 	Uint64 now = SDL_GetTicks64();
-	if (m_accumulatedTime >= 130) {
+	if (m_accumulatedTime >= 100) {
 		m_accumulatedTime = 0;
 		
 		// update the snake's position
@@ -103,34 +105,36 @@ void Game::onUpdate(double dt) {
 			// could just make Game a friend of Player
 			auto& part = m_player->getBodyPart(i);
 
-			if (part.m_x >= 20)
+			if (part.m_x >= m_numCells)
 				part.m_x = 0;
 			else if (part.m_x < 0)
-				part.m_x = 19;
+				part.m_x = m_numCells - 1;
 
-			if (part.m_y >= 20)
+			if (part.m_y >= m_numCells)
 				part.m_y = 0;
 			else if (part.m_y < 0)
-				part.m_y = 19;
+				part.m_y = m_numCells - 1;
 		}
 
 		int headX = m_player->getHeadX();
 		int headY = m_player->getHeadY();
 
+		// update the grid
+		grid[prevTailY * m_numCells + prevTailX] = false;
+
 		// check if we hit ourself
-		if (grid[headY][headX]) {
+		if (grid[headY * m_numCells + headX]) {
 			std::cout << "Player hit themself!" << std::endl;
 			m_state = GameState::GAME_OVER;
 			return;
 		}
 
-		// update the grid
-		grid[headY][headX] = true;
-		grid[prevTailY][prevTailX] = false;
+		grid[headY * m_numCells + headX] = true;
 
 		// snake eats the food
 		if (headX == m_food.getX() && headY == m_food.getY()) {
 			m_player->grow();
+			grid[m_player->getTailY() * m_numCells + m_player->getTailX()] = true;
 
 			// find a new spot for the food
 			int x, y;
@@ -166,47 +170,54 @@ void Game::onRender(SDL_Renderer& renderer) {
 		rect.x += m_windowWidth / 10;
 		SDL_RenderFillRect(&renderer, &rect);
 	}
+
+	// add a small delay to reduce cpu load
+	SDL_Delay(33);
 }
 
 void Game::onDestroy() {
 	delete m_player;
+	delete[] grid;
 }
 
 bool Game::findRandomEmptySpot(int* x, int* y) {
-	int possibleSlots[20 * 20];
+	int* possibleSlots = new int[m_numCells * m_numCells];
 	int count = 0;
 
-	for (int row = 0; row < 20; row++) {
-		for (int column = 0; column < 20; column++) {
-			if (!grid[row][column])
-				possibleSlots[count++] = row * 20 + column;
+	for (int row = 0; row < m_numCells; row++) {
+		for (int column = 0; column < m_numCells; column++) {
+			if (!grid[row * m_numCells + column])
+				possibleSlots[count++] = row * m_numCells + column;
 		}
 	}
 
-	if (!count)
+	if (!count) {
+		delete[] possibleSlots;
 		return false;
+	}
 
 	int randIndex = rand() % count;
 	int slot = possibleSlots[randIndex];
 
-	*x = slot % 20;
-	*y = slot / 20;
+	*x = slot % m_numCells;
+	*y = slot / m_numCells;
 
+	delete[] possibleSlots;
 	return true;
 }
 
 void Game::reset() {
 	// reset player
 	m_player->reset();
-	m_player->getHead().m_x = 9;
-	m_player->getHead().m_y = 9;
+	m_player->getHead().m_x = 0;
+	m_player->getHead().m_y = 0;
 
 	// reset grid
-	for (int row = 0; row < 20; row++)
-		for (int column = 0; column < 20; column++)
-			grid[row][column] = false;
+	for (int row = 0; row < m_numCells; row++)
+		for (int column = 0; column < m_numCells; column++)
+			grid[row * m_numCells + column] = false;
 
-	grid[9][9] = true;
+	grid[0] = true;
 
 	// reset food
 	int x, y;

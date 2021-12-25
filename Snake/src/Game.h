@@ -7,6 +7,7 @@ class Player;
 
 class Game : public Scene {
 public:
+	Game(int numCells);
 	~Game() override;
 	void onInit(const Window& window) override;
 	void onUpdate(double dt) override;
@@ -25,7 +26,7 @@ private:
 	};
 
 private:
-	bool grid[20][20];
+	bool* grid;
 	Player* m_player;
 	Food m_food;
 
@@ -36,5 +37,6 @@ private:
 
 	int m_windowWidth;
 	int m_windowHeight;
+	int m_numCells;
 
 };

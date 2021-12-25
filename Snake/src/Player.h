@@ -24,6 +24,7 @@ private:
 	unsigned int m_length;
 	SnakeBodyPart* m_snakeBodyParts;
 	SnakeBodyPart* m_head, *m_tail;
+	Direction m_prevTailDirection;
 
 public:
 	Player(char x, char y, double cellWidth, double cellHeight);
