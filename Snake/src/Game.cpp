@@ -17,7 +17,10 @@ void Game::onInit(const Window& window) {
 	double cellWidth = m_windowWidth / (double) m_numCells;
 	double cellHeight = m_windowHeight / (double) m_numCells;
 	
-	m_player = new Player(0, 0, cellWidth, cellHeight);
+	int startX = m_numCells / 2;
+	int startY = m_numCells / 2;
+
+	m_player = new Player(startX, startY, cellWidth, cellHeight);
 	grid = new bool[m_numCells * m_numCells];
 
 	// initialize this grid (might not even need this block of code)
@@ -25,7 +28,7 @@ void Game::onInit(const Window& window) {
 		for (int column = 0; column < m_numCells; column++)
 			grid[row * m_numCells + column] = false;
 
-	grid[0] = true;
+	grid[startY * m_numCells + startX] = true;
 	
 	//m_lastUpdateTime = 0;
 	m_accumulatedTime = 0;
@@ -208,16 +211,19 @@ bool Game::findRandomEmptySpot(int* x, int* y) {
 
 void Game::reset() {
 	// reset player
+	int startX = m_numCells / 2;
+	int startY = m_numCells / 2;
+
 	m_player->reset();
-	m_player->getHead().m_x = 0;
-	m_player->getHead().m_y = 0;
+	m_player->getHead().m_x = startX;
+	m_player->getHead().m_y = startY;
 
 	// reset grid
 	for (int row = 0; row < m_numCells; row++)
 		for (int column = 0; column < m_numCells; column++)
 			grid[row * m_numCells + column] = false;
 
-	grid[0] = true;
+	grid[startY * m_numCells + startX] = true;
 
 	// reset food
 	int x, y;
